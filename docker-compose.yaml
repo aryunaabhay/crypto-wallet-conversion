@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./crypto_wallet_front_cli
+      dockerfile: .Dockerfile
+    expose:
+      - "5001"
+    ports:
+      - "5001:5001"
+    depends_on:
+      - transaction-request
+      - transaction-execution
+
+  transaction-request:
+    build:
+      context: ./transaction_request_service
+      dockerfile: .Dockerfile
+    expose:
+      - "5002"
+    ports:
+      - "5002:5002"
+
+  transaction-execution:
+    build:
+      context: ./transaction_execution_service
+      dockerfile: .Dockerfile
+    expose:
+      - "5003"
+    ports:
+      - "5003:5003"

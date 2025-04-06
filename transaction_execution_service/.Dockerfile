@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 5003
 
 # Set the command to run the application
-CMD ["flask", "--app", "service", "run","--host", "0.0.0.0", "--port", "5003"]
+CMD ["python", "-u", "service.py"]

@@ -1,36 +1,44 @@
-from flask import request, jsonify
-from transaction_request import TransactionRequest
-from config import create_app
-from db import db
-
-app = create_app()
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from .db import db
 
 
-@app.route('/create_transaction_request', methods=['POST'])
-def create_transaction_request():
+from .transaction_request import TransactionRequest
+
+
+app = FastAPI()
+
+# Modelo para validación de datos de entrada
+class TransactionRequestModel(BaseModel):
+    user_id: int
+    amount: float
+    currency_from: str
+    currency_to: str
+
+@app.post("/create_transaction_request", status_code=201)
+def create_transaction_request(request: TransactionRequestModel):
     try:
-        data = request.get_json()
         transaction_request = TransactionRequest(
-            user_id=data['user_id'],
-            amount=data['amount'],
-            currency_from=data['currency_from'],
-            currency_to=data['currency_to'],
+            user_id=request.user_id,
+            amount=request.amount,
+            currency_from=request.currency_from,
+            currency_to=request.currency_to,
             status='pending'
         )
         db.session.add(transaction_request)
         db.session.commit()
-        return jsonify({"id": transaction_request.id}), 201
+        return {"id": transaction_request.id}
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.route('/get_transaction_status/<int:transaction_id>', methods=['GET'])
-def get_transaction_status(transaction_id):
+@app.get("/get_transaction_status/{transaction_id}")
+def get_transaction_status(transaction_id: int):
     try:
         transaction_request = TransactionRequest.query.get(transaction_id)
         if transaction_request:
-            return jsonify({"id": transaction_request.id, "status": transaction_request.status}), 200
+            return {"id": transaction_request.id, "status": transaction_request.status}
         else:
-            return jsonify({"error": "Transaction not found"}), 404
+            raise HTTPException(status_code=404, detail="Transaction not found")
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))

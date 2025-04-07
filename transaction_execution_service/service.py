@@ -20,6 +20,8 @@ session = Session()
 tasas = {
     ("USD", "EUR"): 0.92,
     ("EUR", "USD"): 1.08,
+    ("USDC", "EURC"): 0.92,
+    ("EURC", "USDC"): 1.08,
     ("USD", "JPY"): 150.0,
     ("JPY", "USD"): 0.0067,
     ("EUR", "JPY"): 163.0,
@@ -39,7 +41,7 @@ def procesar_transaccion(transaccion):
         session.commit()
 
         time.sleep(2)
-        tasa = obtener_tasa(transaccion.currency_from, transaccion.currency_to)
+        tasa = obtener_tasa(transaccion.currency_from.upper(), transaccion.currency_to.upper())
         if tasa is None:
             print(f"Tasa no encontrada para {transaccion.currency_from} -> {transaccion.currency_to}")
             transaccion.status = "failed"  # Si no hay tasa, falla
@@ -73,7 +75,7 @@ def run_periodically(scheduler, interval):
     if (transaccion):
         procesar_transaccion(transaccion)
     else: 
-        print("sin transacciones ppendientes")
+        print("sin transacciones pendientes")
     scheduler.enter(interval, 1, run_periodically, (scheduler, interval))
 
 

@@ -6,7 +6,7 @@ from requests import request
 console = Console()
 
 def check_transaction_status(transaction_id: int) -> str:
-    url = "http://localhost:5002/get_transaction_status/" + str(transaction_id)
+    url = "http://localhost:5002/transaction_request/get_status/" + str(transaction_id)
     try:
         response = request("GET", url)
         if response.status_code == 200:
@@ -18,7 +18,7 @@ def check_transaction_status(transaction_id: int) -> str:
         return None
 
 def create_transaction_request(user_id: int, amount: float, currency_from: str, currency_to: str) -> int:
-    url = "http://localhost:5002/create_transaction_request"
+    url = "http://localhost:5002/transaction_request/create"
     data = {
         "user_id": user_id,
         "amount": amount,
@@ -35,18 +35,6 @@ def create_transaction_request(user_id: int, amount: float, currency_from: str, 
         console.print(f"[bold red]Error:[/bold red] {e}")
         return None
 
-def get_balance(user_id: int) -> float:
-    url = f"http://localhost:5002/get_balance/{user_id}"
-    try:
-        response = request("GET", url)
-        if response.status_code == 200:
-            result = response.json()
-            return result.get("balance", 0.0)
-        else:
-            raise Exception("Failed to fetch balance")
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
-        return None
 
 # Display a welcome message
 console.print("[bold green]Welcome to the Crypto Wallet CLI![/bold green]")
@@ -79,7 +67,7 @@ elif choice == "2":
     
     # Get the balance of the user (example with user_id = 1)
     user_id = 1
-    balance = get_balance(user_id)
+    balance = 100
     
     if balance is not None:
         console.print(f"[bold green]Your balance is:[/bold green] {balance} USD")

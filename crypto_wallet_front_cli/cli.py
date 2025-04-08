@@ -1,6 +1,7 @@
 from rich.console import Console
 from rich.prompt import Prompt
 from requests import request
+import time
 
 # Initialize the console
 console = Console()
@@ -59,6 +60,8 @@ if choice == "1":
     
     if create_transaction_request_result:
         console.print(f"[bold green]Transaction Request ID:[/bold green] {create_transaction_request_result}")
+        with console.status("[bold green]Processing...[/bold green]", spinner="dots") as status:
+            time.sleep(4)
         transaction_status = check_transaction_status(create_transaction_request_result)
         if transaction_status:
             console.print(f"[bold green]Transaction Status:[/bold green] {transaction_status}")
@@ -73,4 +76,4 @@ elif choice == "2":
         console.print(f"[bold green]Your balance is:[/bold green] {balance} USD")
     else:
         console.print("[bold red]Failed to retrieve balance.[/bold red]")
-    
+
